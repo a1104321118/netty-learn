@@ -1,0 +1,17 @@
+package netty;
+
+option java_package = "com.hr.netty.learn.codec.protobuf";
+option java_outer_classname = "SubscribeReqProto";
+
+message SubscribeReq
+{
+   required int32     subReqID = 1;
+   required string    userName = 2;
+   required string    productName = 3;
+   repeated string    address = 4; //list
+}
+
+//生成语句
+// cd /Users/huangrui/local/idea/MyProjects/netty-learn/src/main/resources/protobuf/
+// protoc --java_out=./ ./*
+// 编译当前目录下的所有文件，并放到当前目录下，注意，生成完成后把java类复制到对应的包下面，并把原来的java文件删掉，否则类会冲突
