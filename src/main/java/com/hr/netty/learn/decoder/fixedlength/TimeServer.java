@@ -45,7 +45,7 @@ public class TimeServer {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
 
-                        ch.pipeline().addLast(new FixedLengthFrameDecoder(10));
+                        ch.pipeline().addLast(new FixedLengthFrameDecoder(10));//在这里设置最多接受10个字节的长度
                         ch.pipeline().addLast(new StringDecoder());
 
                         ch.pipeline().addLast(new ChannelHandlerAdapter(){

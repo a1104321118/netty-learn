@@ -45,7 +45,8 @@ public class TimeClient {
                             @Override
                             public void channelActive(ChannelHandlerContext ctx) {
 
-                                ByteBuf byteBuf = Unpooled.copiedBuffer("hello world!!!!".getBytes());
+                                ByteBuf byteBuf = Unpooled.copiedBuffer("hello world!!!!!!!!!!!".getBytes());
+                                //ByteBuf byteBuf = Unpooled.copiedBuffer("lalallalllalalalalala".getBytes());
                                 ctx.writeAndFlush(byteBuf);
                             }
 

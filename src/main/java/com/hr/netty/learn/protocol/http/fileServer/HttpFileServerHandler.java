@@ -42,8 +42,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * @version 1.0
  * @date 2014年2月14日
  */
-public class HttpFileServerHandler extends
-        SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final String url;
 
     public HttpFileServerHandler(String url) {
@@ -53,25 +52,36 @@ public class HttpFileServerHandler extends
     @Override
     public void messageReceived(ChannelHandlerContext ctx,
                                 FullHttpRequest request) throws Exception {
+
+        //判断解码是否成功
         if (!request.getDecoderResult().isSuccess()) {
             sendError(ctx, BAD_REQUEST);
             return;
         }
+        //判断方法是否合法
         if (request.getMethod() != GET) {
             sendError(ctx, METHOD_NOT_ALLOWED);
             return;
         }
+
+        //获取请求路径
         final String uri = request.getUri();
+
+        //根据请求路径获得文件本地目录
         final String path = sanitizeUri(uri);
         if (path == null) {
             sendError(ctx, FORBIDDEN);
             return;
         }
+
+
         File file = new File(path);
         if (file.isHidden() || !file.exists()) {
             sendError(ctx, NOT_FOUND);
             return;
         }
+
+        //如果请求的是一个目录的话，就把文件目录返回给浏览器
         if (file.isDirectory()) {
             if (uri.endsWith("/")) {
                 sendListing(ctx, file);
@@ -84,6 +94,8 @@ public class HttpFileServerHandler extends
             sendError(ctx, FORBIDDEN);
             return;
         }
+
+        //启动下载文件
         RandomAccessFile randomAccessFile = null;
         try {
             randomAccessFile = new RandomAccessFile(file, "r");// 以只读的方式打开文件
@@ -100,8 +112,7 @@ public class HttpFileServerHandler extends
         }
         ctx.write(response);
         ChannelFuture sendFileFuture;
-        sendFileFuture = ctx.write(new ChunkedFile(randomAccessFile, 0,
-                fileLength, 8192), ctx.newProgressivePromise());
+        sendFileFuture = ctx.write(new ChunkedFile(randomAccessFile, 0, fileLength, 8192), ctx.newProgressivePromise());
         sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
             @Override
             public void operationProgressed(ChannelProgressiveFuture future,
@@ -120,8 +131,7 @@ public class HttpFileServerHandler extends
                 System.out.println("Transfer complete.");
             }
         });
-        ChannelFuture lastContentFuture = ctx
-                .writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);//由于使用了chunked编码，所以要在最后加个标识
         if (!isKeepAlive(request)) {
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
@@ -154,6 +164,7 @@ public class HttpFileServerHandler extends
         if (!uri.startsWith("/")) {
             return null;
         }
+        //解析出本地路径
         uri = uri.replace('/', File.separatorChar);
         if (uri.contains(File.separator + '.')
                 || uri.contains('.' + File.separator) || uri.startsWith(".")
