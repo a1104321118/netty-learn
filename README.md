@@ -15,4 +15,5 @@ netty权威指南-学习笔记
  * tcpcorrect  解决tcp粘包/拆包的问题
  * decoder 解决tcp粘包/拆包的各种类型的解码器
  * codec  各种第三方序列化框架
+ * protocol netty支持的各种协议 1.http 2.websocket
  ```
